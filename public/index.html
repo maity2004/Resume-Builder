@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Builder</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        input, textarea { width: 100%; margin-bottom: 15px; padding: 8px; }
+        textarea { height: 80px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1>Resume Builder</h1>
+
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone">
+
+<textarea id="education" placeholder="Education (School, Degree)"></textarea>
+<textarea id="skills" placeholder="Skills (JavaScript, Node.js, etc.)"></textarea>
+<textarea id="projects" placeholder="Projects (Title - Description)"></textarea>
+<textarea id="experience" placeholder="Experience (Job Title - Company)"></textarea>
+
+<button onclick="generateResume()">Generate PDF</button>
+
+<script>
+async function generateResume() {
+    const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        education: document.getElementById("education").value,
+        skills: document.getElementById("skills").value,
+        projects: document.getElementById("projects").value,
+        experience: document.getElementById("experience").value
+    };
+
+    // Use a relative path so it hits the same port the site is running on
+    const res = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resume.pdf";
+        a.click();
+    } else {
+        console.error("Server returned error:", res.status);
+        alert("Failed to generate PDF. Check terminal for errors.");
+    }
+}
+</script>
+
+</body>
+</html>
